@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="מניות">
+<title>המניות של עידן</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+@font-face{font-family:Heebo;src:url(heebo.ttf) format("truetype");font-weight:100 900;font-display:swap}
+:root{--bg:#070b18;--bg2:#0d1426;--card:rgba(255,255,255,.045);--card2:rgba(255,255,255,.07);--line:rgba(255,255,255,.08);
+--tx:#e8edf7;--mut:#8b96ad;--up:#22c55e;--dn:#ef4444;--gold:#facc15;--acc:#60a5fa;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Heebo,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh;overscroll-behavior-y:contain}
+.num{direction:ltr;unicode-bidi:isolate;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-block}
+.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}
+header{position:fixed;top:0;inset-inline:0;z-index:30;padding:calc(var(--safe-t) + 10px) 16px 10px;display:flex;align-items:center;gap:12px;
+background:linear-gradient(180deg,rgba(7,11,24,.96),rgba(7,11,24,.75));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.burger{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;flex:none}
+.burger span{display:block;width:20px;height:2px;background:var(--tx);border-radius:2px;position:relative}
+.burger span:before,.burger span:after{content:"";position:absolute;inset-inline:0;height:2px;background:var(--tx);border-radius:2px}
+.burger span:before{top:-6px}.burger span:after{top:6px}
+.htitle{flex:1;font-weight:700;font-size:18px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.htitle small{display:block;font-weight:400;font-size:11px;color:var(--mut)}
+.refresh{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--mut);font-size:18px;cursor:pointer}
+.refresh.spin{animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+main{padding:calc(var(--safe-t) + 78px) 16px calc(var(--safe-b) + 30px);max-width:640px;margin:0 auto}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:min(82vw,330px);background:linear-gradient(180deg,#0f1830,#0a1022);z-index:50;transform:translateX(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+padding:calc(var(--safe-t) + 18px) 14px 20px;border-inline-start:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.5)}
+body.menu .scrim{opacity:1;pointer-events:auto}body.menu .drawer{transform:none}
+.dhead{display:flex;align-items:center;gap:12px;padding:4px 6px 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.dhead img{width:44px;height:44px;border-radius:12px}.dhead b{font-size:17px}.dhead div small{display:block;color:var(--mut);font-size:12px}
+.nav a{display:flex;align-items:center;gap:14px;padding:14px 12px;margin:3px 0;border-radius:14px;color:var(--tx);text-decoration:none;font-size:16.5px;font-weight:500}
+.nav a .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:var(--card2);flex:none}
+.nav a.on{background:linear-gradient(90deg,rgba(96,165,250,.0),rgba(96,165,250,.16));box-shadow:inset -3px 0 0 var(--acc)}
+.nav a small{display:block;color:var(--mut);font-size:12px;font-weight:400}
+.dfoot{margin-top:auto;color:var(--mut);font-size:12px;padding:10px 8px;line-height:1.5}
+/* home */
+.hero{position:relative;border-radius:28px;overflow:hidden;padding:30px 22px 26px;margin-top:6px;
+background:radial-gradient(120% 90% at 100% 0%,rgba(96,165,250,.35),transparent 55%),radial-gradient(90% 80% at 0% 100%,rgba(34,197,94,.22),transparent 60%),linear-gradient(160deg,#111b36,#0a1124);border:1px solid var(--line)}
+.hero:after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200'><path d='M0 160 L50 140 L90 150 L140 110 L190 120 L240 80 L290 95 L340 50 L400 30' fill='none' stroke='%23facc15' stroke-opacity='.12' stroke-width='3'/></svg>") bottom/100% 60% no-repeat;pointer-events:none}
+.hero .logo{width:64px;height:64px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.hero h1{margin:18px 0 6px;font-size:30px;font-weight:800;line-height:1.15}
+.hero p{margin:0;color:#b8c3da;font-size:15.5px;line-height:1.5}
+.hero .when{margin-top:14px;font-size:13px;color:var(--mut)}
+.pills{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 4px;position:relative;z-index:1}
+.pill{background:rgba(7,11,24,.55);border:1px solid var(--line);border-radius:16px;padding:12px}
+.pill .n{font-size:12.5px;color:var(--mut)}.pill .v{font-size:18px;font-weight:700;margin-top:2px}.pill .p{font-size:14px;font-weight:600}
+.cta{margin-top:18px;display:flex;gap:10px;position:relative;z-index:1}
+.btn{flex:1;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;background:var(--tx);color:#0a1022}
+.btn.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.tile{display:block;text-decoration:none;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;min-height:118px;position:relative;overflow:hidden}
+.tile .ic{font-size:24px}.tile b{display:block;margin-top:10px;font-size:15.5px}.tile small{color:var(--mut);font-size:12.5px}
+.tile .kpi{position:absolute;top:14px;left:14px;font-size:13px;font-weight:700}
+.tile.wide{grid-column:1/-1;min-height:auto;display:flex;align-items:center;gap:14px}.tile.wide b{margin:0}
+/* generic */
+h2{font-size:24px;margin:8px 0 4px;font-weight:800}.sub{color:var(--mut);font-size:13.5px;margin:0 0 16px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 10px;text-align:center}
+.stat .v{font-size:19px;font-weight:800}.stat .l{font-size:11.5px;color:var(--mut);margin-top:2px}
+.rec .top{display:flex;align-items:flex-start;gap:10px}
+.tk{font-weight:800;font-size:18px;letter-spacing:.3px}.nm{color:var(--mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.big{margin-inline-start:auto;text-align:left;font-size:22px;font-weight:800}
+.big small{display:block;font-size:11.5px;color:var(--mut);font-weight:400;text-align:left}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.kv{background:rgba(255,255,255,.03);border-radius:12px;padding:8px}.kv .l{font-size:11px;color:var(--mut)}.kv .v{font-size:14.5px;font-weight:600}
+.range{margin-top:12px}.range .bar{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--dn),#f59e0b 40%,var(--up));position:relative;opacity:.85}
+.range .dot{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #0a1022;transform:translate(50%,-50%);box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+.range .lb{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:6px}
+.badge{display:inline-block;font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--card2);color:var(--mut);margin-inline-end:4px;margin-top:6px}
+.badge.g{background:rgba(34,197,94,.14);color:#86efac}.badge.r{background:rgba(239,68,68,.14);color:#fca5a5}.badge.y{background:rgba(250,204,21,.13);color:#fde68a}
+.chips{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--tx);color:#0a1022;font-weight:700}
+.day{font-size:13px;color:var(--mut);margin:18px 4px 8px;font-weight:600}
+.row{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .mid{flex:1;min-width:0}.row .px{font-size:12.5px;color:var(--mut)}
+.row .p{font-weight:800;font-size:16px;text-align:left;min-width:70px}
+.flag{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--card2);color:var(--mut);margin-inline-start:6px}
+.idx{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.idx .nm2{font-weight:700;font-size:16px}.idx .en{font-size:11.5px;color:var(--mut)}
+.idx .pr{font-size:21px;font-weight:800;text-align:left}.idx .ch{text-align:left;font-weight:700;font-size:14.5px}
+.idx svg{grid-column:1/-1;width:100%;height:54px;margin-top:6px}
+.idx .per{grid-column:1/-1;display:flex;gap:8px;margin-top:6px}
+.idx .per span{flex:1;background:rgba(255,255,255,.03);border-radius:10px;padding:6px 8px;font-size:12px;color:var(--mut)}
+.idx .per b{display:block;font-size:14px}
+.scan{white-space:pre-wrap;line-height:1.65;font-size:14px;color:#cdd6e8}
+.scan li{margin-bottom:6px}.scan ul{padding-inline-start:18px;margin:6px 0}
+details summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details summary::-webkit-details-marker{display:none}details summary:after{content:"▾";margin-inline-start:auto;color:var(--mut)}
+details[open] summary:after{content:"▴"}
+.sec{display:flex;align-items:center;gap:10px;margin:20px 0 10px}.sec h3{margin:0;font-size:18px}.sec .tag{font-size:12px;color:var(--mut)}
+.wbar{height:6px;border-radius:6px;background:rgba(255,255,255,.06);margin-top:6px;position:relative;overflow:hidden}
+.wbar i{position:absolute;top:0;bottom:0;border-radius:6px}
+.foot{text-align:center;color:var(--mut);font-size:12px;margin-top:24px;line-height:1.7}
+.empty{color:var(--mut);text-align:center;padding:24px 10px;font-size:14px}
+.fade{animation:fade .35s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.nb{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11.5px;font-weight:800;line-height:1}
+.burger{position:relative}.burger .nb{font-style:normal;position:absolute;top:-6px;left:-6px;box-shadow:0 0 0 2px var(--bg)}
+.nav a .nb{margin-inline-start:auto}
+.ghero{display:flex;align-items:center;gap:14px;margin:4px 0 14px}.ghero img{width:52px;height:52px;border-radius:15px}
+.ghero h1{margin:0;font-size:24px;font-weight:800}.ghero p{margin:2px 0 0;color:var(--mut);font-size:13.5px}
+.feedh{display:flex;align-items:center;gap:10px;margin:6px 0 10px}.feedh h2{margin:0;font-size:21px}.feedh .tag{font-size:12.5px;color:var(--mut)}
+.feedh .live{width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.rc{background:linear-gradient(160deg,rgba(96,165,250,.10),rgba(255,255,255,.035) 45%);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px;position:relative}
+.rc.isnew{border-color:rgba(250,204,21,.55);box-shadow:0 0 0 1px rgba(250,204,21,.25),0 10px 30px rgba(250,204,21,.06)}
+.rc .hd{display:flex;align-items:flex-start;gap:10px}.rc .tk{font-size:21px}
+.rc .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.whenb{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:999px;cursor:pointer;border:0;font-family:inherit;line-height:1.3}
+.whenb.eve{background:rgba(129,140,248,.18);color:#c7d2fe}
+.whenb.morn{background:rgba(250,204,21,.16);color:#fde68a}
+.whenn{display:none;margin-top:8px;font-size:12.5px;color:#b8c3da;line-height:1.5}
+.whenn.on,.whenn.show{display:block}
+.row .whenb{margin-top:4px;font-size:11px}
+.mtag{display:inline-block;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px}
+.mtag.upd{background:rgba(96,165,250,.16);color:#93c5fd}
+.mtag.can{background:rgba(239,68,68,.16);color:#fca5a5}
+.mtag.ok{background:rgba(34,197,94,.16);color:#86efac}
+.rc.gone,.row.gone{opacity:.55;filter:grayscale(.35)}
+.act{font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px}
+.act.buy{background:rgba(34,197,94,.16);color:#86efac}.act.sell{background:rgba(239,68,68,.16);color:#fca5a5}.act.conditional{background:rgba(250,204,21,.15);color:#fde68a}
+.newb{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--gold);color:#1a1400;animation:glow 1.6s ease-in-out infinite alternate}
+@keyframes glow{from{box-shadow:0 0 0 rgba(250,204,21,0)}to{box-shadow:0 0 12px rgba(250,204,21,.55)}}
+.cond{margin-top:10px;font-size:13.5px;background:rgba(250,204,21,.08);border:1px dashed rgba(250,204,21,.35);color:#fde68a;border-radius:12px;padding:8px 10px}
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.plan .kv{text-align:center;padding:8px 4px}.plan .kv .v{font-size:14px}.plan .kv .s{font-size:11px;margin-top:1px}
+.why{margin-top:12px;font-size:14px;line-height:1.6;color:#d5ddee;border-inline-start:3px solid var(--acc);padding:2px 10px 2px 0;background:rgba(96,165,250,.05);border-radius:0 0 0 0}
+.why small{display:block;color:var(--mut);font-size:11.5px;margin-top:4px}
+.rf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--mut)}
+.rf .now{margin-inline-start:auto;font-size:14px;color:var(--tx);font-weight:600}
+.st{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--card2);color:var(--mut)}
+.st.open{background:rgba(96,165,250,.15);color:#93c5fd}.st.target{background:rgba(34,197,94,.15);color:#86efac}.st.stop,.st.stopped,.st.cancelled{background:rgba(239,68,68,.15);color:#fca5a5}
+.st.conditional{background:rgba(250,204,21,.13);color:#fde68a}.st.expired{background:rgba(255,255,255,.06);color:var(--mut)}
+.mkt{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;margin:16px 0 4px}
+.mkt .pills{margin:8px 0 0}.mkt .pill{background:rgba(255,255,255,.03)}
+.fab{position:fixed;left:16px;bottom:calc(var(--safe-b) + 18px);z-index:25;display:flex;align-items:center;gap:8px;padding:13px 18px;border-radius:999px;
+background:linear-gradient(135deg,#60a5fa,#a78bfa);color:#0a1022;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 10px 30px rgba(96,165,250,.35)}
+.ask{display:flex;align-items:center;gap:14px;padding:18px;border-radius:20px;text-decoration:none;color:#0a1022;font-weight:800;font-size:18px;margin:6px 0 10px}
+.ask.s{background:linear-gradient(135deg,#facc15,#fb923c)}.ask.l{background:linear-gradient(135deg,#4ade80,#22d3ee)}
+.ask .ic{font-size:28px}.ask small{display:block;font-weight:500;font-size:12.5px;opacity:.8}
+.q{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.5}
+.q:last-child{border-bottom:0}.q span{flex:1}
+.cp{flex:none;border:1px solid var(--line);background:var(--card2);color:var(--tx);border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.cp.ok{background:rgba(34,197,94,.18);color:#86efac}
+.toast{position:fixed;bottom:calc(var(--safe-b) + 24px);left:50%;transform:translateX(-50%);background:#111b36;border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-size:14px;z-index:60;opacity:0;transition:.2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <button class="burger" id="burger" aria-label="תפריט"><span></span></button>
+  <div class="htitle" id="htitle">המניות של עידן<small id="hsub">טוען נתונים…</small></div>
+  <button class="refresh" id="refresh" aria-label="רענון">⟳</button>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer" aria-label="תפריט">
+  <div class="dhead"><img src="icons/icon-192.png" alt=""><div><b>המניות של עידן</b><small>מעקב המלצות ובורסות</small></div></div>
+  <div class="nav" id="nav"></div>
+  <div class="dfoot" id="dfoot"></div>
+</nav>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<script>
+const PAGES = [
+  {id:'home',  ic:'🏠', t:'דף הבית', s:'מסך פתיחה'},
+  {id:'active',ic:'🎯', t:'המלצות פעילות', s:'כל ההמלצות הפתוחות כרגע'},
+  {id:'portfolio',ic:'💼', t:'תיק מניות', s:'תיק לטווח ארוך · יעד 10% בשנה'},
+  {id:'consult',ic:'💬', t:'התייעצות', s:'שאל את הבוטים מה לקנות עכשיו'},
+  {id:'long',  ic:'🌱', t:'מניות לטווח הארוך', s:'המלצות הבוט לטווח ארוך'},
+  {id:'short', ic:'⚡', t:'מניות לטווח הקצר', s:'המלצות יומיות, ת״א וארה״ב'},
+  {id:'us',    ic:'🇺🇸', t:'בורסת ארה״ב', s:'מדדים, עליות וירידות'},
+  {id:'tase',  ic:'🇮🇱', t:'בורסת תל אביב', s:'מדדים, עליות וירידות'},
+  {id:'weekly',ic:'📊', t:'סיכום מניות שבועי', s:'קצר וארוך בנפרד'},
+];
+let D = null, shortFilter = 'all', weekIdx = 0;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (v, d=2) => v==null ? '—' : Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const cur = c => c==='ILS' ? '₪' : '$';
+const money = (v, c) => v==null ? '<span class="num mut">—</span>' : `<span class="num">${c==='ILS'?'':'$'}${fmt(v, v>=1000?1:2)}${c==='ILS'?' ₪':''}</span>`;
+const pc = (v, big) => v==null ? '<span class="num mut">—</span>' : `<span class="num ${v>0?'up':v<0?'dn':''}">${v>0?'▲ +':v<0?'▼ ':''}${fmt(v)}%</span>`;
+const cls = v => v==null?'':v>0?'up':v<0?'dn':'';
+const dmy = s => { if(!s) return '—'; const [y,m,d] = s.slice(0,10).split('-'); return `${+d}.${+m}`; };
+const tstr = iso => { if(!iso) return '—'; const d = new Date(iso); return d.toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}); };
+
+function nav(){
+  const cur = (location.hash||'#home').slice(1);
+  const n = newCount();
+  $('#nav').innerHTML = PAGES.map(p=>`<a href="#${p.id}" class="${p.id===cur?'on':''}"><span class="ic">${p.ic}</span><span>${p.t}<small>${p.s}</small></span>${(p.id==='active'||p.id==='home')&&n?`<span class="nb">${n}</span>`:''}</a>`).join('');
+  $('#burger').innerHTML = '<span></span>' + (n ? `<i class="nb">${n}</i>` : '');
+}
+function openMenu(o){ document.body.classList.toggle('menu', o); }
+$('#burger').onclick = () => openMenu(!document.body.classList.contains('menu'));
+$('#scrim').onclick = () => openMenu(false);
+$('#nav').addEventListener('click', e => { if (e.target.closest('a')) openMenu(false); });
+window.addEventListener('hashchange', () => { openMenu(false); render(); window.scrollTo(0,0); });
+
+async function load(force){
+  $('#refresh').classList.add('spin');
+  try { const r = await fetch('data.json?t=' + Date.now(), {cache: 'no-store'}); D = await r.json(); D.byId = {}; [...D.short.rows, ...D.long.rows].forEach(x => D.byId[x.id] = x); trackNew(); }
+  catch(e){ if(!D) $('#app').innerHTML = '<div class="empty">לא הצלחתי לטעון נתונים. בדוק חיבור לאינטרנט.</div>'; }
+  $('#refresh').classList.remove('spin'); render();
+}
+$('#refresh').onclick = () => load(true);
+
+// ---- "חדש" tracking: ids the phone has already shown are kept in localStorage ----
+const NEW = new Set();           // ids that are new in this session (stay marked until the app is closed)
+let unseenBadge = new Set();     // ids counted in the menu badge (cleared when "המלצות פעילות" is opened)
+// ---- 22:00 rollover (phone clock, Asia/Jerusalem): after 22:00 the home feed shows only the next trading day ----
+function ilNow(){ const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false,weekday:'short'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+  return {date:`${p.year}-${p.month}-${p.day}`, hour:(+p.hour)%24, wd:p.weekday}; }
+function addDays(ds, n){ const d = new Date(ds+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); }
+function isWeekend(ds){ const w = new Date(ds+'T12:00:00Z').getUTCDay(); return w===0 || w===6; }   // TASE & US trade Mon–Fri
+function nextTD(ds){ let d = addDays(ds,1); while (isWeekend(d)) d = addDays(d,1); return d; }
+function feedTarget(){ const n = ilNow();
+  if (n.hour >= 22) return {day: nextTD(n.date), mode:'tomorrow'};
+  if (isWeekend(n.date)) return {day: nextTD(n.date), mode:'next'};
+  return {day: n.date, mode:'today'}; }
+function isHiddenRec(r){ return !r || r.status==='cancelled' || r.status==='stop' || r.status==='stopped' || r.status==='target' || r.morning_status==='cancelled'; }
+function feedShortIds(){ const t = feedTarget(); return D.short.rows.filter(r => r.date === t.day && !isHiddenRec(r)).map(r => r.id); }
+function feedLongIds(){ return (D.feed.long_ids||[]).filter(id => D.byId[id] && !isHiddenRec(D.byId[id])); }
+function trackNew(){
+  const all = [...D.short.rows, ...D.long.rows].map(r=>r.id);
+  let seen = null; try { seen = JSON.parse(localStorage.getItem('seenRecs')||'null'); } catch(e){}
+  if (!Array.isArray(seen)) {    // first open on this device: only the latest day's recs count as new
+    const latest = new Set(feedShortIds().length ? feedShortIds() : D.short.rows.filter(r=>r.date===D.feed.latest_short_day).map(r=>r.id));
+    seen = all.filter(id => !latest.has(id));
+  }
+  const S = new Set(seen);
+  all.forEach(id => { if (!S.has(id)) { NEW.add(id); unseenBadge.add(id); } });
+  localStorage.setItem('seenRecs', JSON.stringify(all));
+  localStorage.setItem('lastOpen', new Date().toISOString());
+}
+function newCount(){ return D ? [...unseenBadge].filter(id => (D.active_ids||[]).includes(id) || feedShortIds().includes(id) || feedLongIds().includes(id)).length : 0; }
+
+function foot(){ return `<div class="foot">עודכן לאחרונה: <span class="num">${tstr(D.updated_at)}</span> (שעון ישראל)<br>מחירים: Yahoo Finance · המלצות: הבוטים שלך<br>זה לא ייעוץ השקעות</div>`; }
+function head(t, s){ return `<h2>${t}</h2><p class="sub">${s}</p>`; }
+function stats(a, labels){ return `<div class="stats">${labels.map(([v,l,c])=>`<div class="stat"><div class="v ${c||''}">${v}</div><div class="l">${l}</div></div>`).join('')}</div>`; }
+
+function render(){
+  const id = (location.hash||'#home').slice(1);
+  if (id==='active') unseenBadge.clear();   // opening "המלצות פעילות" clears the menu count (cards stay marked "חדש")
+  nav();
+  const page = PAGES.find(p=>p.id===id) || PAGES[0];
+  $('#htitle').innerHTML = `${page.id==='home'?'המניות של עידן':page.t}<small id="hsub">${D?('עודכן '+tstr(D.updated_at)):'טוען נתונים…'}</small>`;
+  $('#dfoot').innerHTML = D ? `עודכן: ${tstr(D.updated_at)} (שעון ישראל)<br>לא ייעוץ השקעות` : '';
+  if (!D) return;
+  const f = {home, active, portfolio, consult, long, short, us:()=>market('us'), tase:()=>market('tase'), weekly}[page.id];
+  $('#app').innerHTML = `<div class="fade">${f()}</div>`;
+  bind();
+}
+function bind(){
+  document.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{shortFilter=b.dataset.sf;render();});
+  document.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>{weekIdx=+b.dataset.wk;render();});
+  const m = $('#openmenu'); if (m) m.onclick = () => openMenu(true);
+  document.querySelectorAll('.cp').forEach(b=>b.onclick=()=>{ copyText(b.dataset.q); b.textContent='הועתק ✓'; b.classList.add('ok'); toast('השאלה הועתקה – הדבק אותה בצ׳אט עם הבוט'); setTimeout(()=>{b.textContent='העתק';b.classList.remove('ok');},2000); });
+  document.querySelectorAll('a[data-copy]').forEach(a=>a.addEventListener('click',()=>{ copyText(a.dataset.copy); toast('השאלה הועתקה – פותח את הבוט…'); }));  // no preventDefault: the plain href opens the bot
+  document.querySelectorAll('.whenb').forEach(b=>b.onclick=()=>{ const n=b.closest('.rc,.row')?.querySelector('.whenn'); if(n) n.classList.toggle('show'); });
+}
+
+const ACT = {buy:'קנייה', sell:'מכירה', conditional:'מותנה'};
+const STAT = {open:'פתוחה', target:'✓ הגיעה ליעד', stop:'✕ נעצרה בסטופ', stopped:'✕ נעצרה בסטופ', conditional:'⏳ ממתינה לכניסה', expired:'הסתיימה', cancelled:'בוטלה'};
+const iss = r => { const s = r.issued_at||r.date; if (s.length<=10) return new Date(s+'T12:00:00').toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'numeric'});
+  return new Date(s).toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}); };
+function entryTxt(r){ if (r.entry_lo!=null && r.entry_hi!=null) return `<span class="num">${fmt(r.entry_lo)}–${fmt(r.entry_hi)}</span>`;
+  if (r.entry_hi!=null) return `עד <span class="num">${fmt(r.entry_hi)}</span>`; if (r.entry_lo!=null) return `מ-<span class="num">${fmt(r.entry_lo)}</span>`; return money(r.ref, r.cur); }
+function buyWhen(r){
+  let t = r.buy_timing || null;
+  if (!t) return {badge:'', note:''};
+  const eve = t === 'evening';
+  const label = eve ? '🌙 לקנות ערב לפני' : '☀️ לקנות בבוקר';
+  let hint = '';
+  if (eve && r.market === 'US') hint = 'לפני סגירת השוק בארה״ב ב־23:00';
+  else if (eve && r.market === 'TASE') hint = 'לבצע הוראת לימיט הערב';
+  else if (!eve && r.market === 'TASE' && r.session === 'evening') hint = 'לחכות להמלצות הבוקר';
+  else if (!eve && r.market === 'TASE') hint = 'אפשר לקנות מהפתיחה ב־10:00';
+  else if (!eve && r.market === 'US' && r.session === 'evening') hint = 'לחכות להמלצות הבוקר של ארה״ב';
+  else if (!eve && r.market === 'US') hint = 'אפשר לקנות אחרי הפתיחה ב־16:30';
+  const botNote = (r.buy_timing_note || '').trim();
+  const extra = [hint, botNote].filter(Boolean).filter((v,i,a) => a.indexOf(v) === i).join(' · ');
+  const badge = `<button type="button" class="whenb ${eve?'eve':'morn'}" title="${esc(extra||label)}" aria-label="${esc(label)}${extra?' — '+esc(extra):''}">${label}</button>`;
+  const note = extra ? `<div class="whenn show">${esc(extra)}</div>` : '';
+  return {badge, note};
+}
+function morningTag(r){
+  const st = r.morning_status;
+  const note = (r.morning_note || r.cancel_reason || '').trim();
+  if (st === 'valid') {
+    const tag = `<span class="mtag ok" title="${esc(note||'בתוקף')}">✓ בתוקף</span>`;
+    return {tag, note: note ? `<div class="whenn show">${esc(note)}</div>` : ''};
+  }
+  if (st === 'updated') {
+    const tag = `<span class="mtag upd" title="${esc(note||'עודכן בבוקר')}">עודכן בבוקר</span>`;
+    return {tag, note: note ? `<div class="whenn show">${esc(note)}</div>` : ''};
+  }
+  if (st === 'cancelled' || r.status === 'cancelled') {
+    const tag = `<span class="mtag can" title="${esc(note||'בוטל')}">בוטל</span>`;
+    return {tag, note: note ? `<div class="whenn show">${esc(note)}</div>` : ''};
+  }
+  return {tag:'', note:''};
+}
+function recCard(r){
+  const isNew = NEW.has(r.id), base = r.ref ?? (r.entry_lo!=null&&r.entry_hi!=null ? (r.entry_lo+r.entry_hi)/2 : r.entry_hi);
+  const dT = base && r.target!=null ? (r.target/base-1)*100 : null, dS = base && r.stop!=null ? (r.stop/base-1)*100 : null;
+  const bw = buyWhen(r), mt = morningTag(r), gone = isHiddenRec(r);
+  const act = gone ? (r.status==='cancelled' || r.morning_status==='cancelled'
+    ? '<span class="act sell">בוטל</span>'
+    : `<span class="act sell">${STAT[r.status]||'נסגרה'}</span>`)
+    : `<span class="act ${r.action||'buy'}">${ACT[r.action]||'קנייה'}</span>`;
+  return `<div class="rc ${isNew?'isnew':''}${gone?' gone':''}">
+   <div class="hd"><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px"><span class="tk">${esc(r.ticker)}</span><span class="nm">${esc(r.name)}</span></div>
+    <div class="chips2">${act}<span class="flag" style="margin:0">${r.market==='TASE'?'ת״א':'ארה״ב'}</span><span class="flag" style="margin:0">${r.kind==='long'?'טווח ארוך':'טווח קצר'}</span>${gone?'':bw.badge}${mt.tag}${isNew?'<span class="newb">חדש</span>':''}</div>${gone?'':bw.note}${mt.note}</div>
+    <div class="big ${cls(r.pct)}" style="font-size:19px">${r.pct==null?'<span class="mut" style="font-size:14px">—</span>':pc(r.pct)}<small>מאז ההמלצה</small></div></div>
+   ${r.condition?`<div class="cond">⚠️ ${esc(r.condition)}</div>`:''}
+   <div class="plan"><div class="kv"><div class="l">כניסה</div><div class="v">${entryTxt(r)}</div><div class="s mut">${r.cur==='ILS'?'₪':'$'}</div></div>
+    <div class="kv"><div class="l">יעד</div><div class="v">${money(r.target, r.cur)}</div><div class="s up">${dT==null?'':`<span class="num">+${fmt(dT,1)}%</span>`}</div></div>
+    <div class="kv"><div class="l">סטופ</div><div class="v">${r.stop==null?'<span class="mut">לא נקבע</span>':money(r.stop, r.cur)}</div><div class="s dn">${dS==null?'':`<span class="num">${fmt(dS,1)}%</span>`}</div></div>
+    <div class="kv"><div class="l">החזקה</div><div class="v" style="font-size:12.5px;line-height:1.3">${r.horizon?esc(r.horizon).replace(/([\d–-]+)/,'<span class="num">$1</span>'):'—'}</div></div></div>
+   ${r.reason?`<div class="why">״${esc(r.reason)}״<small>— הבוט ${r.kind==='long'?'לטווח הארוך':'לטווח הקצר'}${r.risk?` · סיכון: ${esc(r.risk)}`:''}</small></div>`:''}
+   <div class="rf"><span class="st ${r.status}">${STAT[r.status]||r.status}</span><span>🕒 ${iss(r)}</span>
+    <span class="now">עכשיו ${money(r.current, r.cur)}</span></div>
+  </div>`;
+}
+function home(){
+  const sp = D.us.indices.find(i=>i.sym==='^GSPC')||{}, ta = D.tase.indices.find(i=>i.sym==='TA35.TA')||{};
+  const nq = D.us.indices.find(i=>i.sym==='^IXIC')||{}, t125 = D.tase.indices.find(i=>i.sym==='^TA125.TA')||{};
+  const h = new Date().toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',hour:'numeric',hour12:false})|0;
+  const greet = h<5?'לילה טוב':h<12?'בוקר טוב':h<17?'צהריים טובים':h<21?'ערב טוב':'לילה טוב';
+  const w = D.weekly[0], F = D.feed;
+  const pill = i => `<div class="pill"><div class="n">${esc(i.name)}</div><div class="v num">${fmt(i.price)}</div><div class="p">${pc(i.pct)}</div></div>`;
+  const T = feedTarget(), sh = feedShortIds().map(id=>D.byId[id]).filter(r=>r && !isHiddenRec(r)), lg = feedLongIds().map(id=>D.byId[id]).filter(r=>r && !isHiddenRec(r));
+  const dayName = new Date(T.day+'T12:00:00').toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'});
+  const isTomorrow = T.day === addDays(ilNow().date, 1);
+  const fTitle = T.mode==='today' ? 'המלצות היום' : isTomorrow ? 'המלצות למחר' : 'המלצות ליום המסחר הבא';
+  const fNote = T.mode==='tomorrow' ? '<p class="sub" style="margin:-4px 0 10px">🌙 אפשר לקנות כבר היום לפני סגירת השוק בארה״ב</p>' : '';
+  const fEmpty = T.mode==='today' ? 'ההמלצות של היום יעלו בקרוב' : 'ההמלצות למחר יעלו בקרוב';
+  const sOrd = x => ({open:0, conditional:1, target:2, stop:3, expired:4}[x.status] ?? 5);
+  const shSorted = sh.slice().sort((a,b)=> (NEW.has(b.id)-NEW.has(a.id)) || (sOrd(a)-sOrd(b)) || String(b.issued_at).localeCompare(String(a.issued_at)));
+  return `<div class="ghero"><img src="icons/icon-192.png" alt=""><div><h1>${greet}, עידן 👋</h1><p>${newCount()?`<b style="color:var(--gold)">${newCount()} המלצות חדשות מאז הפעם הקודמת</b>`:'ההמלצות והבורסות שלך במקום אחד'}</p></div></div>
+  <a class="tile wide" style="margin:4px 0 14px" href="#active"><div class="ic">🎯</div><div><b>המלצות</b><small>${(D.active_ids||[]).length} המלצות פעילות${newCount()?` · ${newCount()} חדשות`:''}</small></div></a>
+  <div class="mkt"><div style="display:flex;align-items:center"><b>השווקים עכשיו</b><span class="mut" style="margin-inline-start:auto;font-size:12px">${tstr(D.updated_at)}</span></div>
+   <div class="pills">${pill(sp)}${pill(ta)}${pill(nq)}${pill(t125)}</div></div>
+  <div class="tiles">
+    <a class="tile" href="#long"><span class="kpi">${pc(D.long.stats.avg)}</span><div class="ic">🌱</div><b>טווח ארוך</b><small>${D.long.rows.length} המלצות במעקב</small></a>
+    <a class="tile" href="#short"><span class="kpi">${pc(w?w.short.stats.avg:null)}</span><div class="ic">⚡</div><b>טווח קצר</b><small>${w?w.short.rows.length:0} המלצות השבוע</small></a>
+    <a class="tile" href="#us"><span class="kpi">${pc(sp.pct)}</span><div class="ic">🇺🇸</div><b>בורסת ארה״ב</b><small>${D.us.indices.length} מדדים</small></a>
+    <a class="tile" href="#tase"><span class="kpi">${pc(ta.pct)}</span><div class="ic">🇮🇱</div><b>בורסת ת״א</b><small>${D.tase.indices.length} מדדים</small></a>
+    <a class="tile wide" href="#portfolio"><div class="ic">💼</div><div><b>תיק מניות</b><small>${D.portfolio?`${D.portfolio.holdings.length} אחזקות · יעד 10% בשנה`:'בקרוב'}</small></div>${D.portfolio?`<span style="margin-inline-start:auto;font-weight:800">${pc(D.portfolio.return_pct)}</span>`:''}</a>
+    <a class="tile wide" href="#weekly"><div class="ic">📊</div><div><b>סיכום מניות שבועי</b><small>${w?`שבוע ${dmy(w.week_start)}–${dmy(w.week_end)}${w.partial?' (בעיצומו)':''}`:''}</small></div></a>
+  </div>${foot()}<a class="fab" href="#consult">💬 התייעצות</a>`;
+}
+const BOTS = {
+  s: {t:'שאל את בוט הטווח הקצר', d:'עסקאות של יום עד כמה ימים · ת״א וארה״ב', ic:'⚡', href:'grokbot://app/v1/agent?id=120becaa-4a21-474a-8ef0-dd250b3d030d', qs:[
+    'איזו מניה הכי מומלץ לקנות עכשיו לפי החדשות והאנליסטים? תן לי מחיר כניסה, סטופ לוס ומחיר יעד למכירה.',
+    'מה ההמלצה הכי חזקה שלך היום בבורסת תל אביב? תן לי טווח כניסה, סטופ לוס ויעד.',
+    'מה ההמלצה הכי חזקה שלך היום בארה״ב לפני הפתיחה? תן לי טווח כניסה, סטופ לוס ויעד.',
+    'האם ההמלצות הפעילות שלך עדיין בתוקף, או שכדאי לצאת מחלק מהן?']},
+  l: {t:'שאל את בוט הטווח הארוך', d:'השקעות לחודשים ושנים', ic:'🌱', href:'grokbot://app/v1/agent?id=d0fe6543-e6b7-4c2d-9e73-74f0ed20e01f', qs:[
+    'איזו מניה הכי מומלץ לקנות עכשיו לטווח ארוך לפי החדשות והאנליסטים? תן לי מחיר כניסה, סטופ לוס ומחיר יעד למכירה.',
+    'מה המצב של ההמלצות שנתת לי לטווח ארוך? להוסיף, להחזיק או למכור?',
+    'איזו מניה ישראלית הכי כדאית עכשיו לטווח ארוך? תן לי טווח כניסה, יעד ותרחיש רע.']}
+};
+function copyText(t){
+  try { if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t); } catch(e){}
+  const a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly',''); a.style.position='fixed'; a.style.opacity='0';
+  document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch(e){} a.remove(); return Promise.resolve();
+}
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200); }
+function consult(){
+  let h = head('💬 התייעצות', 'רוצה לדעת מה הכי כדאי לקנות עכשיו? שאל את הבוט: הוא יבדוק את החדשות ואת האנליסטים ויגיד לך איזו מניה הכי מומלצת, עם מחיר כניסה, סטופ לוס ומחיר יעד למכירה.');
+  h += `<div class="card" style="font-size:13.5px;color:var(--mut);line-height:1.6">לחיצה על כפתור מעתיקה את השאלה הראשונה ופותחת את הצ׳אט עם הבוט. שם רק מדביקים ושולחים. אפשר גם להעתיק כל שאלה אחרת מהרשימה.</div>`;
+  for (const k of ['s','l']) { const b = BOTS[k];
+    h += `<a class="ask ${k}" href="${b.href}" data-copy="${esc(b.qs[0])}"><span class="ic">${b.ic}</span><span>${b.t}<small>${b.d}</small></span><span style="margin-inline-start:auto">←</span></a>
+     <div class="card" style="padding:4px 14px;margin-bottom:22px">${b.qs.map(q=>`<div class="q"><span>${esc(q)}</span><button class="cp" data-q="${esc(q)}">העתק</button></div>`).join('')}</div>`;
+  }
+  return h + `<div class="foot">התשובות של הבוטים הן הערכות, לא ייעוץ השקעות.</div>`;
+}
+function active(){
+  const act = (D.active_ids||[]).map(id=>D.byId[id]).filter(Boolean);
+  const wk = ilNow().date.slice(0,8)+'01';   // closed list resets on the 1st of each month
+  const closed = [...D.short.rows, ...D.long.rows].filter(r=>!r.active && (r.hit_date||r.date) >= wk).sort((a,b)=>(b.hit_date||b.date).localeCompare(a.hit_date||a.date));
+  let h = head('המלצות פעילות', 'המלצות שעדיין בתוקף: לא נעצרו בסטופ, לא הגיעו ליעד ולא עבר זמן ההחזקה. החדשות ביותר למעלה.');
+  const nS = act.filter(r=>r.kind==='short').length, nL = act.length-nS, nC = act.filter(r=>r.status==='conditional').length;
+  h += stats(null, [[act.length,'פעילות'],[`${nS} / ${nL}`,'קצר / ארוך'],[nC,'ממתינות לכניסה']]);
+  h += act.length ? act.map(recCard).join('') : '<div class="empty card">אין כרגע המלצות פעילות.</div>';
+  if (closed.length) h += `<details class="card"><summary>📁 נסגרו החודש (${closed.length})</summary>${closed.map(r=>{
+    const gone = isHiddenRec(r), mt = morningTag(r);
+    const why = r.cancel_reason ? esc(r.cancel_reason) : '';
+    return `<div class="row${gone?' gone':''}"><div class="mid"><span class="tk" style="font-size:15px">${esc(r.ticker)}</span> <span class="nm">${esc(r.name)} · ${dmy(r.date)}</span><div class="px"><span class="st ${r.status}">${STAT[r.status]||r.status}</span> ${mt.tag} ${r.hit_date?dmy(r.hit_date):''}${why?` · ${why}`:''}</div></div><div class="p">${pc(r.result_pct)}</div></div>`;
+  }).join('')}</details>`;
+  return h + foot();
+}
+
+function portfolio(){
+  const P = D.portfolio;
+  let h = head('💼 תיק מניות', 'תיק לטווח הארוך עם פיזור בין ת״א לארה״ב. התיק מתעדכן לפי השוק: נכנסים ויוצאים כשצריך, ולא נסגר אוטומטית אחרי יומיים כמו ההמלצות.');
+  if (!P) return h + '<div class="empty card">התיק עוד לא הוקם.</div>' + foot();
+  const ils = v => v==null ? '—' : `<span class="num">${fmt(v,0)} ₪</span>`;
+  h += `<div class="card" style="background:linear-gradient(160deg,rgba(34,197,94,.12),rgba(255,255,255,.035) 55%)">
+    <div style="display:flex;align-items:flex-end;gap:10px"><div><div class="mut" style="font-size:12.5px">שווי התיק (מודל)</div><div style="font-size:26px;font-weight:800">${ils(P.value_ils)}</div><div class="mut" style="font-size:12px">התחלה ${ils(P.start_value_ils)} · ${dmy(P.start_date)} · ${P.days} ימים</div></div>
+    <div class="big ${cls(P.return_pct)}">${pc(P.return_pct)}<small>מאז ההקמה</small></div></div></div>`;
+  h += stats(null, [[`<span class="num">${P.target_annual_pct}%</span>`,'יעד שנתי'],[P.annualized_pct==null?'<span class="mut" style="font-size:13px">אחרי 30 יום</span>':pc(P.annualized_pct),'תשואה שנתית'],[pc(P.target_to_date_pct),'קצב היעד עד היום']]);
+  if (P.benchmarks && P.benchmarks.length) h += `<div class="card" style="display:flex;gap:10px;font-size:13.5px"><div style="flex:1">💼 התיק<br><b>${pc(P.return_pct)}</b></div>${P.benchmarks.map(b=>`<div style="flex:1">📈 ${esc(b.name)}<br><b>${pc(b.pct)}</b></div>`).join('')}</div>`;
+  h += `<div class="sec"><h3>האחזקות</h3><span class="tag">${P.holdings.length} מניות · דולר <span class="num">${fmt(P.fx_usdils,3)}</span> ₪</span></div>`;
+  h += P.holdings.slice().sort((a,b)=>b.weight_pct-a.weight_pct).map(r=>{
+    const bw = buyWhen(r);
+    const al = r.alert==='stop' ? '<span class="mtag can">⚠️ נגעה בסטופ – לבדוק יציאה</span>' : r.alert==='target' ? '<span class="mtag ok">🎯 הגיעה ליעד – לשקול מימוש</span>' : '';
+    return `<div class="rc">
+     <div class="hd"><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px"><span class="tk">${esc(r.ticker)}</span><span class="nm">${esc(r.name)}</span></div>
+      <div class="chips2"><span class="flag" style="margin:0">${r.market==='TASE'?'ת״א':'ארה״ב'}</span><span class="flag" style="margin:0">משקל <span class="num">${fmt(r.weight_pct,0)}%</span>${r.cur_weight_pct!=null&&Math.abs(r.cur_weight_pct-r.weight_pct)>=0.5?` (עכשיו <span class="num">${fmt(r.cur_weight_pct,1)}%</span>)`:''}</span>${bw.badge}${al}</div>${bw.note}</div>
+      <div class="big ${cls(r.pnl_pct)}" style="font-size:19px">${pc(r.pnl_pct)}<small>רווח/הפסד</small></div></div>
+     <div class="plan"><div class="kv"><div class="l">כניסה</div><div class="v">${money(r.entry_price, r.cur)}</div><div class="s mut">${dmy(r.entry_date)}</div></div>
+      <div class="kv"><div class="l">עכשיו</div><div class="v">${money(r.current, r.cur)}</div><div class="s ${cls(r.day_pct)}">${r.day_pct==null?'':`היום <span class="num">${fmt(r.day_pct,1)}%</span>`}</div></div>
+      <div class="kv"><div class="l">יעד</div><div class="v">${money(r.target, r.cur)}</div><div class="s mut">${esc(r.horizon||'')}</div></div>
+      <div class="kv"><div class="l">סטופ</div><div class="v">${r.stop==null?'<span class="mut" style="font-size:12px">ליבה</span>':money(r.stop, r.cur)}</div><div class="s mut">${r.value_ils!=null?`<span class="num">${fmt(r.value_ils,0)} ₪</span>`:''}</div></div></div>
+     <div class="why">${esc(r.rationale)}<small>🚪 יציאה: ${esc(r.exit_rule)}</small></div>
+    </div>`;
+  }).join('');
+  if (P.closed && P.closed.length) h += `<details class="card"><summary>📁 אחזקות שנסגרו (${P.closed.length})</summary>${P.closed.map(c=>`<div class="row"><div class="mid"><span class="tk" style="font-size:15px">${esc(c.ticker)}</span> <span class="nm">${esc(c.name||'')} · ${dmy(c.entry_date)}–${dmy(c.exit_date)}</span><div class="px">${money(c.entry_price,c.cur)} ← ${money(c.exit_price,c.cur)}${c.reason?` · ${esc(c.reason)}`:''}</div></div><div class="p">${pc(c.realized_pct)}</div></div>`).join('')}</details>`;
+  const LOG = (P.log||[]).slice().reverse(), TR = (P.trades||[]).slice().reverse();
+  h += `<details class="card"${LOG.length<=3?' open':''}><summary>📝 יומן שינויים (${LOG.length})</summary>${LOG.map(l=>`<div class="row"><div class="mid"><div class="px"><span class="num">${dmy(l.date)}</span></div><div style="font-size:14px;line-height:1.5">${esc(l.text)}</div></div></div>`).join('')}
+   ${TR.length?`<div class="day" style="margin:14px 2px 4px">פעולות (${TR.length})</div>${TR.map(t=>`<div class="row"><div class="mid"><span class="act ${t.type==='sell'?'sell':'buy'}">${t.type==='sell'?'מכירה':t.type==='rebalance'?'איזון':'קנייה'}</span> <b>${esc(t.ticker)}</b> <span class="nm">${dmy(t.date)} · ${money(t.price, t.market==='TASE'?'ILS':'USD')}${t.note?` · ${esc(t.note)}`:''}</span></div><div class="p">${t.realized_pct!=null?pc(t.realized_pct):(t.value_ils!=null?`<span class="num mut" style="font-size:13px">${fmt(t.value_ils,0)} ₪</span>`:'')}</div></div>`).join('')}`:''}</details>`;
+  h += `<div class="card" style="font-size:12.5px;color:var(--mut);line-height:1.6">ℹ️ 10% בשנה הוא יעד, לא הבטחה. זה תיק מודל (100,000 ₪ על הנייר) לפי מחירי Yahoo; התשואה כוללת שינויי דולר/שקל, בלי עמלות ודיבידנדים. קנייה בבלינק: ת״א בבוקר, ארה״ב אחרי 16:30. זה לא ייעוץ השקעות.</div>`;
+  return h + foot();
+}
+
+function rangeBar(r){
+  if (r.stop==null || r.target==null || r.current==null) return '';
+  const pos = Math.max(0, Math.min(100, (r.current - r.stop) / (r.target - r.stop) * 100));
+  return `<div class="range"><div class="bar"><span class="dot" style="right:${pos}%"></span></div>
+   <div class="lb"><span>סטופ ${money(r.stop, r.cur)}</span><span>יעד ${money(r.target, r.cur)}</span></div></div>`;
+}
+function long(){
+  const rows = D.long.rows.filter(r => !isHiddenRec(r));
+  const pcts = rows.map(r=>r.pct).filter(x=>x!=null);
+  const s = {avg: pcts.length? pcts.reduce((a,b)=>a+b,0)/pcts.length : null, up: pcts.filter(x=>x>0).length, down: pcts.filter(x=>x<0).length, n: rows.length};
+  let h = head('מניות לטווח הארוך', 'ההמלצות שהבוט לטווח הארוך נתן לך, מול המחיר הנוכחי. המלצה שבוטלה או שנעצרה בסטופ יורדת מכאן אוטומטית ונשארת בסיכום השבועי.');
+  h += stats(s, [[pc(s.avg),'ממוצע מההמלצה'],[`<span class="up">${s.up}</span> / <span class="dn">${s.down}</span>`,'עולות / יורדות'],[rows.length,'המלצות']]);
+  if (!rows.length) return h + '<div class="empty">עוד אין המלצות לטווח ארוך.</div>' + foot();
+  h += rows.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(r=>{
+    const bw = buyWhen(r), mt = morningTag(r);
+    return `<div class="card rec">
+    <div class="top"><div><div class="tk">${esc(r.ticker)}</div><div class="nm">${esc(r.name)} · הומלצה ${dmy(r.date)}</div>
+      <div class="chips2" style="margin-top:6px">${bw.badge}${mt.tag}</div>${bw.note}${mt.note}</div>
+    <div class="big ${cls(r.pct)}">${pc(r.pct)}<small>מאז ההמלצה</small></div></div>
+    <div class="grid3"><div class="kv"><div class="l">מחיר בהמלצה</div><div class="v">${money(r.ref, r.cur)}</div></div>
+    <div class="kv"><div class="l">מחיר נוכחי</div><div class="v">${money(r.current, r.cur)}</div></div>
+    <div class="kv"><div class="l">${r.target!=null?'עד היעד':'טווח כניסה'}</div><div class="v">${r.target!=null&&r.current?pc((r.target/r.current-1)*100):(r.entry_lo?`<span class="num">${fmt(r.entry_lo)}–${fmt(r.entry_hi)}</span>`:'—')}</div></div></div>
+    ${rangeBar(r) || (r.target!=null?`<div class="range"><div class="lb"><span>יעד ${money(r.target,r.cur)}</span><span>${r.stop==null?'סטופ: לא נקבע':''}</span></div></div>`:'')}
+    <div>${r.horizon?`<span class="badge">⏳ ${esc(r.horizon).replace(/([\d–-]+)/,'<span class="num">$1</span>')}</span>`:''}${r.entry_lo?`<span class="badge">כניסה <span class="num">${fmt(r.entry_lo)}–${fmt(r.entry_hi)}</span></span>`:''}<span class="badge">${esc(r.ref_src||'')}</span></div>
+  </div>`;
+  }).join('');
+  return h + foot();
+}
+
+function srow(r){
+  const b = [];
+  const bc = {open:'', target:'g', stop:'r', conditional:'y', expired:''}[r.status] ?? '';
+  b.push(`<span class="badge ${bc}">${STAT[r.status]||r.status}${r.hit_date?' '+dmy(r.hit_date):''}</span>`);
+  if (NEW.has(r.id)) b.push('<span class="badge y">חדש</span>');
+  const bw = buyWhen(r), mt = morningTag(r);
+  if (bw.badge) b.push(bw.badge);
+  if (mt.tag) b.push(mt.tag);
+  return `<div class="row"><div class="mid"><div><span class="tk" style="font-size:16px">${esc(r.ticker)}</span> <span class="nm">${esc(r.name)}</span><span class="flag">${r.bot.includes('ת״א')?'ת״א':'ארה״ב'}</span></div>
+   <div class="px">המלצה ${money(r.ref, r.cur)} ← עכשיו ${money(r.current, r.cur)} · יעד ${money(r.target, r.cur)} · סטופ ${money(r.stop, r.cur)}</div>${b.join('')}${bw.note}${mt.note}</div>
+   <div class="p">${pc(r.pct)}</div></div>`;
+}
+function short(){
+  let rows = D.short.rows.filter(r => !isHiddenRec(r));
+  if (shortFilter!=='all') rows = rows.filter(r => shortFilter==='ta' ? r.bot.includes('ת״א') : !r.bot.includes('ת״א'));
+  const v = rows.map(r=>r.pct).filter(x=>x!=null), avg = v.length? v.reduce((a,b)=>a+b,0)/v.length : null;
+  let h = head('מניות לטווח הקצר', 'ההמלצות היומיות של הבוט לטווח הקצר שעדיין רלוונטיות לקנייה. המלצה שבוטלה או שנעצרה בסטופ יורדת מכאן אוטומטית ונשארת בסיכום השבועי. האחוז הוא מהמחיר שהבוט ציין ועד המחיר האחרון.');
+  h += `<div class="chips">${[['all','הכל'],['ta','תל אביב'],['us','ארה״ב']].map(([k,t])=>`<button class="chip ${shortFilter===k?'on':''}" data-sf="${k}">${t}</button>`).join('')}</div>`;
+  h += stats(null, [[pc(avg),'ממוצע'],[`<span class="up">${v.filter(x=>x>0).length}</span> / <span class="dn">${v.filter(x=>x<0).length}</span>`,'עולות / יורדות'],[rows.length,'המלצות']]);
+  const byDay = {}; rows.forEach(r => (byDay[r.date] = byDay[r.date] || []).push(r));
+  h += Object.keys(byDay).sort().reverse().map(d => `<div class="day">${new Date(d+'T12:00:00').toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'})}</div><div class="card" style="padding:4px 14px">${byDay[d].map(srow).join('')}</div>`).join('');
+  return h + foot();
+}
+
+function spark(arr, up){
+  const a = (arr||[]).filter(x=>x!=null); if (a.length<2) return '';
+  const mn = Math.min(...a), mx = Math.max(...a), W=300, H=54, n=a.length;
+  const pts = a.map((v,i)=>[W - i*(W/(n-1)), H-4-((v-mn)/((mx-mn)||1))*(H-8)]);  // RTL: newest on the left
+  const c = up ? '#22c55e' : '#ef4444', d = pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const id = 'g'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".35"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>
+   <path d="${d} L${pts[n-1][0]} ${H} L${pts[0][0]} ${H} Z" fill="url(#${id})"/><path d="${d}" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+}
+function mdlite(s){
+  const lines = esc(s).split('\n'); let out = '', inl = false;
+  for (let l of lines){
+    l = l.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    if (/^## /.test(l)) { out += `<b style="font-size:15px">${l.slice(3)}</b>\n`; continue; }
+    if (/^\s*[-•] /.test(l)) { if(!inl){out+='<ul>';inl=true;} out += `<li>${l.replace(/^\s*[-•] /,'')}</li>`; continue; }
+    if (inl){out+='</ul>';inl=false;} out += l + '\n';
+  }
+  if (inl) out += '</ul>';
+  return out;
+}
+function market(k){
+  const M = D[k], isUS = k==='us';
+  const up = M.indices.filter(i=>i.pct>0 && i.sym!=='^VIX' && i.sym!=='ILS=X').length, dn = M.indices.filter(i=>i.pct<0 && i.sym!=='^VIX' && i.sym!=='ILS=X').length;
+  let h = head(isUS?'בורסת ארה״ב':'בורסת תל אביב', isUS?'המדדים המרכזיים בוול סטריט: שינוי יומי, שבועי וחודשי.':'מדדי הבורסה בתל אביב: שינוי יומי, שבועי וחודשי.');
+  h += stats(null, [[`<span class="up">${up}</span>`,'מדדים בעלייה היום'],[`<span class="dn">${dn}</span>`,'מדדים בירידה היום'],[`<span class="num" style="font-size:15px">${dmy(M.indices[0]&&M.indices[0].date)}</span>`,'יום מסחר אחרון']]);
+  h += M.indices.map(i => i.missing ? `<div class="card"><b>${esc(i.name)}</b> <span class="mut">– אין נתון כרגע</span></div>` : `<div class="card idx">
+    <div><div class="nm2">${esc(i.name)}</div><div class="en">${esc(i.en||i.sym)}${i.sym==='^VIX'?' · עלייה = יותר פחד':''}</div></div>
+    <div><div class="pr num">${fmt(i.price, i.sym==='ILS=X'?4:2)}</div><div class="ch">${pc(i.pct)} <span class="num ${cls(i.chg)}" style="font-size:12.5px">(${i.chg>0?'+':''}${fmt(i.chg, i.sym==='ILS=X'?4:2)})</span></div></div>
+    ${spark(i.spark, (i.month_pct||0)>=0)}
+    <div class="per"><span>היום<b>${pc(i.pct)}</b></span><span>מתחילת השבוע<b>${pc(i.week_pct)}</b></span><span>חודש<b>${pc(i.month_pct)}</b></span></div>
+  </div>`).join('');
+  const sc = D.scanner && D.scanner[k];
+  if (sc) h += `<details class="card" open><summary>🔎 ממצאי הסורק האחרונים</summary><div class="scan">${mdlite(sc)}</div></details>`;
+  if (!isUS && D.watchlist && D.watchlist.length) h += `<details class="card"><summary>👀 רשימת מעקב של הסורק (לא המלצות)</summary>${D.watchlist.map(w=>`<div class="row"><div class="mid"><span class="tk" style="font-size:15px">${esc(w.ticker)}</span> <span class="nm">${esc(w.name)}</span><div class="px">מחיר ייחוס ${money(w.ref_price,'ILS')} ← ${money(w.current_price,'ILS')} (לפי עדכון הלדג׳ר)</div></div><div class="p">${pc(w.pct)}</div></div>`).join('')}</details>`;
+  return h + foot();
+}
+
+function wbar(v, max){ if (v==null) return ''; const w = Math.min(50, Math.abs(v)/max*50);
+  return `<div class="wbar"><i style="${v>=0?`right:50%`:`left:50%`};width:${w}%;background:${v>=0?'var(--up)':'var(--dn)'}"></i></div>`; }
+function weekly(){
+  const W = D.weekly; if (!W.length) return head('סיכום מניות שבועי','')+'<div class="empty">אין עדיין נתונים.</div>'+foot();
+  const w = W[Math.min(weekIdx, W.length-1)];
+  let h = head('סיכום מניות שבועי', 'העלייה או הירידה של המניות שהומלצו – טווח קצר וטווח ארוך בנפרד.');
+  h += `<div class="chips">${W.map((x,i)=>`<button class="chip ${i===weekIdx?'on':''}" data-wk="${i}">${dmy(x.week_start)}–${dmy(x.week_end)}${x.partial?' · נוכחי':''}</button>`).join('')}</div>`;
+  if (w.partial) h += `<p class="sub">השבוע עוד לא נגמר – הנתונים נכונים עד <span class="num">${dmy(w.through)}</span>.</p>`;
+  // short
+  const S = w.short, ss = S.stats; const mxS = Math.max(1, ...S.rows.map(r=>Math.abs(r.pct||0)));
+  h += `<div class="sec"><h3>⚡ טווח קצר</h3><span class="tag">${S.rows.length} המלצות השבוע</span></div>`;
+  h += stats(null, [[pc(ss.avg),'שינוי ממוצע'],[`<span class="up">${ss.up}</span> / <span class="dn">${ss.down}</span>`,'עלו / ירדו'],[ss.hit==null?'—':`<span class="num">${fmt(ss.hit,0)}%</span>`,'אחוז הצלחה']]);
+  const sBest = S.rows.find(r=>r.ticker===S.best && r.pct!=null && r.pct===Math.max(...S.rows.filter(x=>x.pct!=null).map(x=>x.pct)));
+  const sWorst = S.rows.find(r=>r.ticker===S.worst && r.pct!=null && r.pct===Math.min(...S.rows.filter(x=>x.pct!=null).map(x=>x.pct)));
+  if (sBest) h += `<div class="card" style="display:flex;gap:10px"><div style="flex:1">🏆 הכי טובה<br><b>${esc(sBest.ticker)}</b> ${pc(sBest.pct)}</div><div style="flex:1">📉 הכי חלשה<br><b>${esc(sWorst.ticker)}</b> ${pc(sWorst.pct)}</div><div style="flex:1">🎯 ${S.targets} נגעו ביעד<br>🛑 ${S.stops} נגעו בסטופ</div></div>`;
+  h += `<div class="card" style="padding:4px 14px">${S.rows.length? S.rows.slice().sort((a,b)=>(b.pct??-1e9)-(a.pct??-1e9)).map(r=>{
+    const gone = r.status==='cancelled' || r.status==='stop' || r.status==='stopped';
+    const tag = r.status==='cancelled' ? '<span class="mtag can">בוטל</span>' : r.status==='stop'||r.status==='stopped' ? '<span class="mtag can">✕ נעצרה בסטופ</span>' : r.status==='target' ? '<span class="mtag ok">✓ הגיעה ליעד</span>' : '';
+    return `<div class="row${gone?' gone':''}" style="display:block"><div style="display:flex;gap:8px;align-items:center"><span class="tk" style="font-size:15px">${esc(r.ticker)}</span><span class="nm">${esc(r.name)} · ${dmy(r.date)}</span><span class="flag">${r.bot.includes('ת״א')?'ת״א':'ארה״ב'}</span>${tag}<span style="margin-inline-start:auto;font-weight:800">${r.conditional&&r.ref==null?'<span class="mut" style="font-size:12px">מותנה</span>':pc(r.pct)}</span></div>
+    <div class="px">${money(r.ref,r.cur)} ← ${money(r.close,r.cur)} (${dmy(r.close_date)})</div>${wbar(r.pct, mxS)}</div>`;
+  }).join('') : '<div class="empty">אין המלצות לטווח קצר בשבוע הזה.</div>'}</div>`;
+  // long
+  const L = w.long, ls = L.stats; const mxL = Math.max(1, ...L.rows.map(r=>Math.abs(r.week_pct||0)));
+  h += `<div class="sec"><h3>🌱 טווח ארוך</h3><span class="tag">${L.rows.length} מניות במעקב</span></div>`;
+  h += stats(null, [[pc(ls.avg),'שינוי ממוצע השבוע'],[`<span class="up">${ls.up}</span> / <span class="dn">${ls.down}</span>`,'עלו / ירדו'],[pc(L.since_rec.avg),'ממוצע מאז ההמלצה']]);
+  if (L.best) h += `<div class="card" style="display:flex;gap:10px"><div style="flex:1">🏆 הכי טובה השבוע<br><b>${esc(L.best)}</b> ${pc((L.rows.find(r=>r.ticker===L.best)||{}).week_pct)}</div><div style="flex:1">📉 הכי חלשה השבוע<br><b>${esc(L.worst)}</b> ${pc((L.rows.find(r=>r.ticker===L.worst)||{}).week_pct)}</div></div>`;
+  h += `<div class="card" style="padding:4px 14px">${L.rows.length? L.rows.slice().sort((a,b)=>(b.week_pct??-1e9)-(a.week_pct??-1e9)).map(r=>{
+    const gone = r.status==='cancelled' || r.status==='stop' || r.status==='stopped';
+    const tag = r.status==='cancelled' ? '<span class="mtag can">בוטל</span>' : r.status==='stop'||r.status==='stopped' ? '<span class="mtag can">✕ נעצרה בסטופ</span>' : r.status==='target' ? '<span class="mtag ok">✓ הגיעה ליעד</span>' : '';
+    return `<div class="row${gone?' gone':''}" style="display:block"><div style="display:flex;gap:8px;align-items:center"><span class="tk" style="font-size:15px">${esc(r.ticker)}</span><span class="nm">${esc(r.name)}${r.new_this_week?' · חדשה השבוע':''}</span>${tag}<span style="margin-inline-start:auto;font-weight:800">${pc(r.week_pct)}</span></div>
+    <div class="px">${r.new_this_week?`מההמלצה ${money(r.ref,r.cur)}`:`מתחילת השבוע ${money(r.week_start,r.cur)}`} ← ${money(r.close,r.cur)} (${dmy(r.close_date)}) · מאז ההמלצה ${pc(r.since_rec_pct)}</div>${wbar(r.week_pct, mxL)}</div>`;
+  }).join('') : '<div class="empty">אין מניות לטווח ארוך בשבוע הזה.</div>'}</div>`;
+  return h + foot();
+}
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+render(); load(false);
+let lastMode = null; setInterval(()=>{ if (!D) return; const k = JSON.stringify(feedTarget()); if (lastMode && k!==lastMode && ((location.hash||'#home')==='#home')) render(); lastMode = k; }, 30000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible') load(true); });
+</script>
+</body>
+</html>
